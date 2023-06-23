@@ -722,35 +722,16 @@ def main():
                         x=v['vigencia'], 
                         y=v['valorAutoavaluo'], 
                         name='Avaluo catastral',
-                        line=dict(color='blue')))
-                    
-                    fig.update_layout(
-                        yaxis2=dict(
-                            title="Predial",
-                            titlefont=dict(color="red"),
-                            tickfont=dict(color="red"),
-                            overlaying="y",
-                            side="right"
-                        )
-                    )
-                    
-                    fig.add_trace(go.Bar(
-                        x=v['vigencia'], 
-                        y=v['valorImpuesto'], 
-                        name='Predial',
-                        line=dict(color='red'),
-                        yaxis="y2"))
+                        marker_color='blue'))
                     
                     fig.update_layout(
                         xaxis_title="Vigencia",
                         yaxis_title="Avaluo catastral",
                         plot_bgcolor='white',
                         paper_bgcolor='white',
-                        #width=400,
-                        #height=350
                     )
-    
-                    st.plotly_chart(fig)    
+                    
+                    st.plotly_chart(fig)   
                     
                     csv = convert_df(v)
                     st.download_button(
