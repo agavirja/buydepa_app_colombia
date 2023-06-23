@@ -722,28 +722,32 @@ def main():
                         x=v['vigencia'], 
                         y=v['valorAutoavaluo'], 
                         name='Avaluo catastral',
-                        marker_color='blue'))
-                    
-                    fig.add_trace(go.Bar(
-                        x=v['vigencia'], 
-                        y=v['valorImpuesto'], 
-                        name='Predial',
-                        marker_color='red',
-                        yaxis="y2"))
+                        line=dict(color='blue')))
                     
                     fig.update_layout(
-                        xaxis_title="Vigencia",
-                        yaxis_title="Avaluo catastral",
                         yaxis2=dict(
                             title="Predial",
                             titlefont=dict(color="red"),
                             tickfont=dict(color="red"),
                             overlaying="y",
                             side="right"
-                        ),
+                        )
+                    )
+                    
+                    fig.add_trace(go.Bar(
+                        x=v['vigencia'], 
+                        y=v['valorImpuesto'], 
+                        name='Predial',
+                        line=dict(color='red'),
+                        yaxis="y2"))
+                    
+                    fig.update_layout(
+                        xaxis_title="Vigencia",
+                        yaxis_title="Avaluo catastral",
                         plot_bgcolor='white',
                         paper_bgcolor='white',
-                        barmode='group' # Para poner las barras una al lado de la otra
+                        #width=400,
+                        #height=350
                     )
     
                     st.plotly_chart(fig)    
