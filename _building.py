@@ -119,10 +119,8 @@ def conjuntos_direcciones():
     data     = pd.read_sql_query("""SELECT coddir,direccion,nombre_conjunto FROM bigdata.data_bogota_conjuntos """ , engine)
     data['via'] = data['direccion'].apply(lambda x: dir2comp(x,0))
     v           = data['via'].value_counts().reset_index()
-    st.dataframe(v)
-    st.write(list(v))
-    v           = v[v['via']>50]
-    idd         = data['via'].isin(v['index'])
+    v           = v[v['count']>50]
+    idd         = data['via'].isin(v['via'])
     if sum(~idd)>0:
         data.loc[~idd,'via'] = None
     data['via'] = data['via'].replace(['CL', 'KR', 'TV', 'AK', 'AC', 'DG'],['Calle', 'Carrera', 'Transversal', 'Avenida Carrera', 'Avenida Calle', 'Diagonal'])
