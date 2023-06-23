@@ -1146,4 +1146,217 @@ def main():
                             #height=500
                         )
                         st.plotly_chart(fig, theme="streamlit",use_container_width=True) 
+    
+        #-------------------------------------------------------------------------#
+        # COMPARATIVOS
+        #-------------------------------------------------------------------------#
+        st.markdown('<div style="background-color: #f2f2f2; border: 1px solid #fff; padding: 0px; margin-bottom: 20px;"><h1 style="margin: 0; font-size: 18px; text-align: center; color: #3A5AFF;">Comparables</h1></div>', unsafe_allow_html=True)            
+        col1, col2, col3 = st.columns([1,1,4])
+        with col1:
+            tiponegocio_comparables  = st.selectbox('Tipo de negocio', options=['Venta','Arriendo'])
+            areamin = st.number_input('Área mínima',min_value=20,max_value=600,value=50)
+            if tiponegocio_comparables.lower()=='venta':
+                valormin = st.text_input('Valor mínimo',value='$100,000,000',key='preciomin',on_change=change_preciomin)
+            if tiponegocio_comparables.lower()=='arriendo':
+                valormin = st.text_input('Valor mínimo',value='$2,500,000',key='preciomin',on_change=change_preciomin)
+            
+            preciomin                = Price.fromstring(valormin).amount_float
+            habitaciones_comparables = st.selectbox('Habitaciones', options=[1,2,3,4,5,6],index=2)
+            garajes_comparables      = st.selectbox('Garajes', options=[0,1,2,3,4],index=1)
+        with col2:
+            tipoinmueble_comparables = st.selectbox('Tipo de inmueble', options=['Apartamento','Casa'])
+            areamax = st.number_input('Área máxima',min_value=20,max_value=600,value=120)
+            if tiponegocio_comparables.lower()=='venta':
+                valormax = st.text_input('Valor máximo',value='$2,500,000,000',key='preciomax',on_change=change_preciomax)
+            if tiponegocio_comparables.lower()=='arriendo':
+                valormax = st.text_input('Valor máximo',value='$20,000,000',key='preciomax',on_change=change_preciomax)
+            preciomax         = Price.fromstring(valormax).amount_float
+            banos_comparables = st.selectbox('Baños', options=[1,2,3,4,5,6],index=1)
+            metros            = st.slider('metros a la redonda',100,500,500,step=100)
+    
+        with col1:
+            if st.button('Busqueda de comparables'):
+                st.session_state.datacomparables = getdatacomparativo(latitud,longitud,tiponegocio_comparables,tipoinmueble_comparables,areamin,areamax,preciomin,preciomax,habitaciones_comparables,banos_comparables,garajes_comparables,metros)                                      
+        with col2:
+            if st.session_state.datacomparables.empty is False:
+                csv = convert_df(st.session_state.datacomparables)
+                st.download_button(
+                   "Descargar Data",
+                   csv,
+                   "data_comparables.csv",
+                   "text/csv",
+                   key='data_comparables'
+                )
+            
+        with col3:
+            if st.session_state.datacomparables.empty is False:
+                geojson_data = circle_polygon(metros,latitud, longitud)
+                m = folium.Map(location=[latitud, longitud], zoom_start=15,tiles="cartodbpositron")
+                folium.GeoJson(geojson_data, style_function=style_function).add_to(m)
+    
+                img_style = '''
+                        <style>               
+                            .property-image{
+                              flex: 1;
+                            }
+                            img{
+                                width:200px;
+                                height:120px;
+                                object-fit: cover;
+                                margin-bottom: 2px; 
+                            }
+                        </style>
+                        '''
+                for i, inmueble in st.session_state.datacomparables.iterrows():
+                    if isinstance(inmueble['img1'], str) and len(inmueble['img1'])>20: imagen_principal =  inmueble['img1']
+                    else: imagen_principal = "https://personal-data-bucket-online.s3.us-east-2.amazonaws.com/sin_imagen.png"
+                    url_export   = f"https://buydepa-app-colombia.streamlit.app/Ficha?code={inmueble['code']}&tiponegocio={tiponegocio_comparables}&tipoinmueble={tipoinmueble_comparables}" 
+                    string_popup = f'''
+                    <!DOCTYPE html>
+                    <html>
+                      <head>
+                        {img_style}
+                      </head>
+                      <body>
+                          <div>
+                          <a href="{url_export}" target="_blank">
+                          <div class="property-image">
+                              <img src="{imagen_principal}"  alt="property image" onerror="this.src='https://personal-data-bucket-online.s3.us-east-2.amazonaws.com/sin_imagen.png';">
+                          </div>
+                          </a>
+                          <b> Direccion: {inmueble['direccion']}</b><br>
+                          <b> Precio: ${inmueble['valor']:,.0f}</b><br>
+                          <b> Área: {inmueble['areaconstruida']}</b><br>
+                          <b> Habitaciones: {int(inmueble['habitaciones'])}</b><br>
+                          <b> Baños: {int(inmueble['banos'])}</b><br>
+                          <b> Garajes: {int(inmueble['garajes'])}</b><br>
+                          </div>
+                      </body>
+                    </html>
+                    '''
+                    folium.Marker(location=[inmueble["latitud"], inmueble["longitud"]], popup=string_popup).add_to(m)
+    
+                st_map = st_folium(m,width=1200,height=700)
+                    
+                
+        col1, col2 = st.columns(2)
+        if st.session_state.datacomparables.empty is False:
+            with col1:
+                label       = 'Muestra'
+                html        = boxkpi(len(st.session_state.datacomparables),label)
+                html_struct = BeautifulSoup(html, 'html.parser')
+                st.markdown(html_struct, unsafe_allow_html=True)
+            
+            with col2:
+                label       = 'Valor promedio por mt<sup>2</sup>'
+                html        = boxkpi(f'${st.session_state.datacomparables["valormt2"].median():,.0f}',label)
+                html_struct = BeautifulSoup(html, 'html.parser')
+                st.markdown(html_struct, unsafe_allow_html=True)
+    
+        if st.session_state.datacomparables.empty is False:
+            col1,col2 = st.columns([1,3])
+    
+            css_format = """
+                <style>
+                  .property-card-left {
+                    width: 100%;
+                     /* height: 1600px; */
+                     /* overflow-y: scroll; */
+                    text-align: center;
+                    display: inline-block;
+                    margin: 0px auto;
+                  }
+            
+                  .property-block {
+                    width:32%;
+                    background-color: white;
+                    border: 1px solid gray;
+                    box-shadow: 2px 2px 2px gray;
+                    padding: 3px;
+                    margin-bottom: 10px; 
+              	    display: inline-block;
+              	    float: left;
+                    margin-right: 10px; 
+                  }
+            
+                  .property {
+                    border: 1px solid gray;
+                    box-shadow: 2px 2px 2px gray;
+                    padding: 10px;
+                    margin-bottom: 10px;
+                  }
+                  
+                  .property-image{
+                    flex: 1;
+                  }
+                  .property-info{
+                    flex: 1;
+                  }
+                  
+                  .price-info {
+                    font-family: 'Comic Sans MS', cursive;
+                    font-size: 24px;
+                    margin-bottom: 1px;
+                  }
+             
+                  .admon-info {
+                    font-family: 'Comic Sans MS', cursive;
+                    font-size: 12px;
+                    margin-bottom: 5px;
+                  }
+                  
+                  .caracteristicas-info {
+                    font-size: 16px;
+                    margin-bottom: 2px;
+                  }
+            
+                  img{
+                    max-width: 100%;
+                    width: 100%;
+                    height:250px;
+                    object-fit: cover;
+                    margin-bottom: 10px; 
+                  }
+                </style>
+            """
+            
+            imagenes = ''
+            for i, inmueble in st.session_state.datacomparables.iterrows():
+            
+                if isinstance(inmueble['img1'], str) and len(inmueble['img1'])>20: imagen_principal =  inmueble['img1']
+                else: imagen_principal = "https://personal-data-bucket-online.s3.us-east-2.amazonaws.com/sin_imagen.png"
+                caracteristicas = f'<strong>{inmueble["areaconstruida"]}</strong> mt<sup>2</sup> | <strong>{int(inmueble["habitaciones"])}</strong> hab | <strong>{int(inmueble["banos"])}</strong> baños | <strong>{int(inmueble["garajes"])}</strong> pq'
+                url_export      = f"https://buydepa-app-colombia.streamlit.app/Ficha?code={inmueble['code']}&tiponegocio={tiponegocio_comparables}&tipoinmueble={tipoinmueble_comparables}"
+                
+                if pd.isnull(inmueble['direccion']): direccionlabel = '<p class="caracteristicas-info">&nbsp</p>'
+                else: direccionlabel = f'''<p class="caracteristicas-info">Dirección: {inmueble['direccion'][0:35]}</p>'''
+                
+                imagenes += f'''
+                      <div class="property-block">
+                        <a href="{url_export}" target="_blank">
+                        <div class="property-image">
+                          <img src="{imagen_principal}" alt="property image" onerror="this.src='https://personal-data-bucket-online.s3.us-east-2.amazonaws.com/sin_imagen.png';">
+                        </div>
+                        </a>
+                        <p class="price-info">${inmueble['valor']:,.0f}</h3>
+                        {direccionlabel}
+                        <p class="caracteristicas-info">{caracteristicas}</p>
+                      </div>
+                      '''
+            texto = f"""
+                <!DOCTYPE html>
+                <html>
+                  <head>
+                  {css_format}
+                  </head>
+                  <body>
+                <div class="property-card-left">
+                {imagenes}
+                </div>
+                  </body>
+                </html>
+                """
+            texto = BeautifulSoup(texto, 'html.parser')
+            st.markdown(texto, unsafe_allow_html=True)
+            
         # FALTA SECCION PARA dataconjunto: GRAFICA DE AREA DE CONSTRUCCION Y AMENITIES
