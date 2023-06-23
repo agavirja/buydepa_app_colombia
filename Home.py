@@ -5,9 +5,12 @@ import time
 from datetime import datetime
 from sqlalchemy import create_engine
 
+
+if 'layout' not in st.session_state: 
+    st.session_state.layout = "centered"
     
 #st.set_page_config(layout=st.session_state.layout,initial_sidebar_state="collapsed")
-st.set_page_config(layout="centered")
+st.set_page_config(layout=st.session_state.layout)
 
 
 # streamlit run D:\Dropbox\Empresa\Buydepa\PROYECTOS\APPCOLOMBIA\Home.py
@@ -141,6 +144,7 @@ if st.session_state.signin:
                 st.error(response)
                 
 if st.session_state.access:
+    st.session_state.layout = "wide"
     opciones = {
         'Opcion 1': {
             'url': f'https://buydepa-app-colombia.streamlit.app/Listings?token={st.session_state.token}',
