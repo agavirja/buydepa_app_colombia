@@ -118,6 +118,7 @@ if st.session_state.signin:
         email    = st.text_input("Email").strip()
         contrasena = st.text_input("Password", type="password").strip()
         contrasena = encriptar_contrasena(contrasena)
+        st.write(contrasena)
         nombre   = st.text_input("Nombre Completo").strip().title()
         telefono = st.text_input("Celular",max_chars =10).strip()
         
@@ -138,7 +139,7 @@ if st.session_state.signin:
                     st.session_state.signin = False
                     st.experimental_rerun()
             else:
-                placeholder = st.empty()
+                #placeholder = st.empty()
                 st.error(response)
                 
 if st.session_state.access:
