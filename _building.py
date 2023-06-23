@@ -117,6 +117,8 @@ def conjuntos_direcciones():
     schema   = st.secrets["schema_bigdata"]
     engine   = create_engine(f'mysql+mysqlconnector://{user}:{password}@{host}/{schema}')    
     data     = pd.read_sql_query("""SELECT coddir,direccion,nombre_conjunto FROM bigdata.data_bogota_conjuntos """ , engine)
+    st.write(dir2comp(data['direccion'].iloc[0],0))
+    
     data['via'] = data['direccion'].apply(lambda x: dir2comp(x,0))
     v           = data['via'].value_counts().reset_index()
     v           = v[v['via']>50]
