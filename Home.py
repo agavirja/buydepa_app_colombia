@@ -17,7 +17,16 @@ user     = st.secrets["user_appraisal"]
 password = st.secrets["password_appraisal"]
 host     = st.secrets["host_appraisal"]
 schema   = st.secrets["schema_appraisal"]
-        
+
+contrasena = st.text_input("Password1").strip()
+st.write(contrasena)
+
+contrasena = contrasena.encode('utf-8')
+st.write(contrasena)
+salt             = bcrypt.gensalt()
+contrasena = bcrypt.hashpw(contrasena, salt)
+st.write(contrasena)
+
 def encriptar_contrasena(contrasena_plana):
     contrasena_plana = contrasena_plana.encode('utf-8')
     salt             = bcrypt.gensalt()
