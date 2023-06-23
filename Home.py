@@ -143,23 +143,23 @@ if st.session_state.access:
         'Opcion 1': {
             'url': f'https://buydepa-app-colombia.streamlit.app/Listings?token={st.session_state.token}',
             'imagen': 'https://personal-data-bucket-online.s3.us-east-2.amazonaws.com/buydepa/mapa.png',
-            'titulo': 'Titulo 1'
+            'titulo': 'Listings'
         },
         'Opcion 2': {
             'url': f'https://buydepa-app-colombia.streamlit.app/Detalle_edificio?token={st.session_state.token}',
             'imagen': 'https://personal-data-bucket-online.s3.us-east-2.amazonaws.com/buydepa/edificio.png',
-            'titulo': 'Titulo 2'
+            'titulo': 'Análisis por Edificio'
         },
         'Opcion 3': {
             'url': 'https://buydepa-app-colombia.streamlit.app/Ficha',
             'imagen': 'https://personal-data-bucket-online.s3.us-east-2.amazonaws.com/buydepa/tarjetarealestate.png',
-            'titulo': 'Titulo 3'
+            'titulo': 'Ficha del inmueble'
         }
     }
     
     html_string = '<div style="display: flex; justify-content: space-between;">'
     for nombre, opcion in opciones.items():
-        html_string += f'<div style="text-align: center;"> <a href="{opcion["url"]}"> <img src="{opcion["imagen"]}" width="100" height="100"> </a> <p>{opcion["titulo"]}</p> </div>'
+        html_string += f'<div style="text-align: center;"> <a href="{opcion["url"]}"> <img src="{opcion["imagen"]}" width="400" height="300"> </a> <p>{opcion["titulo"]}</p> </div>'
     html_string += '</div>'
     
     st.markdown(html_string, unsafe_allow_html=True)
