@@ -1,6 +1,5 @@
 import streamlit as st
 import pandas as pd
-import bcrypt
 import hashlib
 import time
 from datetime import datetime
@@ -18,20 +17,11 @@ password = st.secrets["password_appraisal"]
 host     = st.secrets["host_appraisal"]
 schema   = st.secrets["schema_appraisal"]
 
-contrasena = st.text_input("Password1").strip()
-st.write(contrasena)
-
-contrasena = contrasena.encode('utf-8')
-st.write(contrasena)
-salt             = bcrypt.gensalt()
-contrasena = bcrypt.hashpw(contrasena, salt)
-st.write(contrasena)
-
 def encriptar_contrasena(contrasena_plana):
-    contrasena_plana = contrasena_plana.encode('utf-8')
-    salt             = bcrypt.gensalt()
-    contrasena_encriptada = bcrypt.hashpw(contrasena_plana, salt)
-    return contrasena_encriptada
+    token = hashlib.md5()
+    token.update(contrasena_plana.encode('utf-8'))
+    contrasena_plana = token.hexdigest()
+    return contrasena_plana
 
 def verificar_contrasena(email, contrasena):
     engine = create_engine(f'mysql+mysqlconnector://{user}:{password}@{host}/{schema}')
@@ -39,10 +29,12 @@ def verificar_contrasena(email, contrasena):
     engine.dispose()
     if df.empty:
         return False
-    contrasenastock       = df['password'].iloc[0]
-    contrasena_encriptada = contrasenastock.encode('utf-8')
-    contrasena            = contrasena.encode('utf-8')
-    return bcrypt.checkpw(contrasena, contrasena_encriptada)
+    contrasenastock = df['password'].iloc[0]
+    contrasenanew   = encriptar_contrasena(contrasena)
+    if contrasenanew==contrasenastock:
+        return True
+    else:
+        return False
 
 def user_register(data):
     engine   = create_engine(f'mysql+mysqlconnector://{user}:{password}@{host}/{schema}')
@@ -89,7 +81,6 @@ def button_signin():
     st.session_state.login  = False
     st.session_state.signin = True
     
-    
 if st.session_state.access is False:
     col1, col2 = st.columns([5,1])
     if st.session_state.login:
@@ -99,8 +90,6 @@ if st.session_state.access is False:
         with col2:
             st.button('Log in ',on_click=button_login)
     
-
-
 if st.session_state.login:
     placeholder = st.empty()
     with placeholder.form("login form"):
@@ -127,7 +116,6 @@ if st.session_state.signin:
         email    = st.text_input("Email").strip()
         contrasena = st.text_input("Password", type="password").strip()
         contrasena = encriptar_contrasena(contrasena)
-        st.write(contrasena)
         nombre   = st.text_input("Nombre Completo").strip().title()
         telefono = st.text_input("Celular",max_chars =10).strip()
         
@@ -148,7 +136,6 @@ if st.session_state.signin:
                     st.session_state.signin = False
                     st.experimental_rerun()
             else:
-                #placeholder = st.empty()
                 st.error(response)
                 
 if st.session_state.access:
