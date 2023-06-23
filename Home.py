@@ -163,9 +163,8 @@ if st.session_state.access:
         }
     }
     
-    html_string = '<div style="display: flex; justify-content: space-between;">'
+    html_string = '<div style="display: flex; justify-content: flex-start;">'
     for nombre, opcion in opciones.items():
         html_string += f'<div style="text-align: center; margin-right: 20px;"> <a href="{opcion["url"]}"> <img src="{opcion["imagen"]}" width="400" height="300"> </a> <p>{opcion["titulo"]}</p> </div>'
     html_string += '</div>'
-    
     st.markdown(html_string, unsafe_allow_html=True)
