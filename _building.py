@@ -801,7 +801,7 @@ def main():
                 except: garajes_inmueble = ""
                     
                 propertyinfo = f'<strong>{inmueble["areaconstruida"]}</strong> mt<sup>2</sup> | <strong>{int(inmueble["habitaciones"])}</strong> hab | <strong>{int(inmueble["banos"])}</strong> baños {garajes_inmueble}'
-                url_export   = f"http://localhost:8501/Ficha?code={inmueble['code']}&tiponegocio=Venta&tipoinmueble=Apartamento" 
+                url_export   = f"http://https://buydepa-app-colombia.streamlit.app//Ficha?code={inmueble['code']}&tiponegocio=Venta&tipoinmueble=Apartamento" 
     
                 if isinstance(inmueble['direccion'], str): direccion = inmueble['direccion'][0:35]
                 else: direccion = '&nbsp'
@@ -940,7 +940,7 @@ def main():
                 except: garajes_inmueble = ""
                     
                 propertyinfo = f'<strong>{inmueble["areaconstruida"]}</strong> mt<sup>2</sup> | <strong>{int(inmueble["habitaciones"])}</strong> hab | <strong>{int(inmueble["banos"])}</strong> baños {garajes_inmueble}'
-                url_export   = f"http://localhost:8501/Ficha?code={inmueble['code']}&tiponegocio=Arriendo&tipoinmueble=Apartamento" 
+                url_export   = f"http://https://buydepa-app-colombia.streamlit.app//Ficha?code={inmueble['code']}&tiponegocio=Arriendo&tipoinmueble=Apartamento" 
     
                 if isinstance(inmueble['direccion'], str): direccion = inmueble['direccion'][0:35]
                 else: direccion = '&nbsp'
@@ -1231,7 +1231,7 @@ def main():
                 for i, inmueble in st.session_state.datacomparables.iterrows():
                     if isinstance(inmueble['img1'], str) and len(inmueble['img1'])>20: imagen_principal =  inmueble['img1']
                     else: imagen_principal = "https://personal-data-bucket-online.s3.us-east-2.amazonaws.com/sin_imagen.png"
-                    url_export   = f"http://localhost:8501/Ficha?code={inmueble['code']}&tiponegocio={tiponegocio_comparables}&tipoinmueble={tipoinmueble_comparables}" 
+                    url_export   = f"http://https://buydepa-app-colombia.streamlit.app//Ficha?code={inmueble['code']}&tiponegocio={tiponegocio_comparables}&tipoinmueble={tipoinmueble_comparables}" 
                     string_popup = f'''
                     <!DOCTYPE html>
                     <html>
@@ -1347,7 +1347,7 @@ def main():
                 if isinstance(inmueble['img1'], str) and len(inmueble['img1'])>20: imagen_principal =  inmueble['img1']
                 else: imagen_principal = "https://personal-data-bucket-online.s3.us-east-2.amazonaws.com/sin_imagen.png"
                 caracteristicas = f'<strong>{inmueble["areaconstruida"]}</strong> mt<sup>2</sup> | <strong>{int(inmueble["habitaciones"])}</strong> hab | <strong>{int(inmueble["banos"])}</strong> baños | <strong>{int(inmueble["garajes"])}</strong> pq'
-                url_export      = f"http://localhost:8501/Ficha?code={inmueble['code']}&tiponegocio={tiponegocio_comparables}&tipoinmueble={tipoinmueble_comparables}"
+                url_export      = f"http://https://buydepa-app-colombia.streamlit.app//Ficha?code={inmueble['code']}&tiponegocio={tiponegocio_comparables}&tipoinmueble={tipoinmueble_comparables}"
                 
                 if pd.isnull(inmueble['direccion']): direccionlabel = '<p class="caracteristicas-info">&nbsp</p>'
                 else: direccionlabel = f'''<p class="caracteristicas-info">Dirección: {inmueble['direccion'][0:35]}</p>'''
