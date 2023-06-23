@@ -606,8 +606,6 @@ def main():
                         texto = BeautifulSoup(table3(html,'Proceso','%','Valor'), 'html.parser')
                         st.markdown(texto, unsafe_allow_html=True)  
                         
-                
-            col1, col2 = st.columns([1,2])
             with col1:
                 df = dataprocesos[dataprocesos['nombre']=='COMPRAVENTA']
                 if df.empty is False:
@@ -720,36 +718,32 @@ def main():
                     # Creando la figura
                     fig = go.Figure()
                     
-                    fig.add_trace(go.Scatter(
+                    fig.add_trace(go.Bar(
                         x=v['vigencia'], 
                         y=v['valorAutoavaluo'], 
                         name='Avaluo catastral',
-                        line=dict(color='blue')))
+                        marker_color='blue'))
+                    
+                    fig.add_trace(go.Bar(
+                        x=v['vigencia'], 
+                        y=v['valorImpuesto'], 
+                        name='Predial',
+                        marker_color='red',
+                        yaxis="y2"))
                     
                     fig.update_layout(
+                        xaxis_title="Vigencia",
+                        yaxis_title="Avaluo catastral",
                         yaxis2=dict(
                             title="Predial",
                             titlefont=dict(color="red"),
                             tickfont=dict(color="red"),
                             overlaying="y",
                             side="right"
-                        )
-                    )
-                    
-                    fig.add_trace(go.Scatter(
-                        x=v['vigencia'], 
-                        y=v['valorImpuesto'], 
-                        name='Predial',
-                        line=dict(color='red'),
-                        yaxis="y2"))
-                    
-                    fig.update_layout(
-                        xaxis_title="Vigencia",
-                        yaxis_title="Avaluo catastral",
+                        ),
                         plot_bgcolor='white',
                         paper_bgcolor='white',
-                        #width=400,
-                        #height=350
+                        barmode='group' # Para poner las barras una al lado de la otra
                     )
     
                     st.plotly_chart(fig)    
