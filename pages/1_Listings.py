@@ -4,7 +4,6 @@ from sqlalchemy import create_engine
 
 from _listings import main
 
-
 st.set_page_config(layout="wide",initial_sidebar_state="collapsed")
 
 user     = st.secrets["user_appraisal"]

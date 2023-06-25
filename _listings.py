@@ -9,6 +9,7 @@ from bs4 import BeautifulSoup
 from shapely.geometry import Polygon,mapping,shape
 from price_parser import Price
 
+from scripts.user_tracking import tracking
 
 #st.set_page_config(layout="wide",initial_sidebar_state="collapsed")
 
@@ -303,7 +304,7 @@ def main():
                     
             tabla = f'data_colombia_bogota_{st.session_state.tiponegocio.lower()}_{st.session_state.tipoinmueble.lower()}_market'
             getdatamarketcoddir(tabla,consulta)
-            #st.write(inputvar)
+            tracking(st.session_state.email,'listings',st.session_state.tiponegocio)
      
     with col3:            
         if st.button('Resetear Busqueda'):

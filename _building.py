@@ -20,6 +20,7 @@ from st_aggrid import AgGrid, GridOptionsBuilder, GridUpdateMode, DataReturnMode
 
 from scripts.coddir import coddir
 from scripts.html_scripts import table2,table3,boxkpi,boxnumbermoney
+from scripts.user_tracking import tracking
 
 #st.set_page_config(layout="wide",initial_sidebar_state="collapsed")
 
@@ -434,6 +435,8 @@ def main():
         if st.button('Buscar'):
             if direccion!='': 
                 st.session_state.coddir = coddir(direccion)
+                tracking(st.session_state.email,'building',st.session_state.coddir)
+
         
     if st.session_state.coddir!='':
         st.write('---')

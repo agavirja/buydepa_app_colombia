@@ -5,6 +5,7 @@ import time
 from datetime import datetime
 from sqlalchemy import create_engine
 
+from scripts.user_tracking import tracking
 
 if 'layout' not in st.session_state: 
     st.session_state.layout = "centered"
@@ -110,6 +111,7 @@ if st.session_state.login:
                 st.session_state.access = True
                 st.session_state.login  = False
                 st.session_state.signin = False
+                tracking(email,'login')
                 st.experimental_rerun()
             else:
                 st.error("Error en la contraseña o email")
