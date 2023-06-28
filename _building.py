@@ -777,8 +777,9 @@ def main():
                         datapropietario.drop(columns=variables,inplace=True)
     
                     csv = convert_df(datapropietario)
+                    # "Información propietario",
                     st.download_button(
-                       "Información propietario",
+                       "Informacion propietario",
                        csv,
                        "info_predio.csv",
                        "text/csv",
@@ -808,8 +809,9 @@ def main():
                     st.plotly_chart(fig)   
                     
                     csv = convert_df(v)
+                    #"Avalo catastral",
                     st.download_button(
-                       "Avalúo catastral",
+                       "Avalo catastral",
                        csv,
                        "info_avaluo.csv",
                        "text/csv",
