@@ -1107,6 +1107,8 @@ def main():
         #-------------------------------------------------------------------------#
         st.markdown('<div style="background-color: #f2f2f2; border: 1px solid #fff; padding: 0px; margin-bottom: 20px;"><h1 style="margin: 0; font-size: 18px; text-align: center; color: #3A5AFF;">Referencia de precios en el barrio</h1></div>', unsafe_allow_html=True)
         col1, col2 = st.columns(2)
+        st.dataframe(barriopricing)
+        st.dataframe(barriovalorizacion)
         with col1:
             sel_tiponegocio = st.selectbox('Tipo de negocio',options=['Venta','Arriendo'])
         with col2:
