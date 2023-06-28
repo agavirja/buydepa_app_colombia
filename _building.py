@@ -512,7 +512,6 @@ def main():
             if direccion!='': 
                 st.session_state.coddir = coddir(direccion)
                 tracking(st.session_state.email,'building',st.session_state.coddir)
-                st.experimental_rerun()
 
         
     if st.session_state.coddir!='':
