@@ -501,7 +501,7 @@ def main():
         #-------------------------------------------------------------------------#  
         if dataprocesos.empty is False:
             st.markdown('<div style="background-color: #f2f2f2; border: 1px solid #fff; padding: 0px; margin-bottom: 20px;"><h1 style="margin: 0; font-size: 18px; text-align: center; color: #3A5AFF;"><b>Histórico de inmuebles vendidos</b></h1></div>', unsafe_allow_html=True)
-            col1, col2 = st.columns(2)
+            col1, col2, col3 = st.columns(3)
             with col1: 
                 label       = '<label>Total transacciones<br>(últimos 4 años)</label>'
                 html        = boxkpi(len(dataprocesos),label)
@@ -526,7 +526,17 @@ def main():
                     html     = sum(yearc==maxyearc)
                     html     = boxkpi(html,label)
                 html_struct = BeautifulSoup(html, 'html.parser')
-                st.markdown(html_struct, unsafe_allow_html=True)    
+                st.markdown(html_struct, unsafe_allow_html=True)  
+                
+            with col3:
+                df = dataprocesos[dataprocesos['nombre']=='COMPRAVENTA']
+                if df.empty is False:
+                    df['valormt2']   = df['cuantia']/df['areaconstruida']
+                    valormt2building = df['valormt2'].median()
+                    label       = '<label>Valor por mt2<br>(referencia del edificio)</label>'
+                    html        = boxkpi(f'${valormt2building:,.0f}',label)
+                    html_struct = BeautifulSoup(html, 'html.parser')
+                    st.markdown(html_struct, unsafe_allow_html=True)
                 
             col1, col2 = st.columns(2)
             with col1:
@@ -609,17 +619,7 @@ def main():
                                 
                         texto = BeautifulSoup(table3(html,'Proceso','%','Valor'), 'html.parser')
                         st.markdown(texto, unsafe_allow_html=True)  
-                        
-            with col1:
-                df = dataprocesos[dataprocesos['nombre']=='COMPRAVENTA']
-                if df.empty is False:
-                    df['valormt2']   = df['cuantia']/df['areaconstruida']
-                    valormt2building = df['valormt2'].median()
-                    label       = '<label>Valor por mt2<br>(referencia del edificio)</label>'
-                    html        = boxkpi(f'${valormt2building:,.0f}',label)
-                    html_struct = BeautifulSoup(html, 'html.parser')
-                    st.markdown(html_struct, unsafe_allow_html=True)
-                    
+                                            
         #-------------------------------------------------------------------------#
         # DESCRIPCION PREDIO
         #-------------------------------------------------------------------------#  
