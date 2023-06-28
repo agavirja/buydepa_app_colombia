@@ -214,6 +214,13 @@ def getdatanivel2(fcoddir,datapredios):
                         variables    = [x for x in variables if x in dataprocesos]
                         dataprocesos = dataprocesos[variables]
                 except: pass
+    if dataprocesos.empty is False:
+        for i in ['fecha_documento_publico','Fecha','Fecha:']:
+            if i in dataprocesos:
+                try: 
+                    dataprocesos[i] = pd.to_datetime(dataprocesos[i],errors='coerce')
+                except: pass
+                    
     engine.dispose()
     return dataprocesos
     
