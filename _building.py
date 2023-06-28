@@ -118,6 +118,10 @@ def conjuntos_direcciones():
     schema   = st.secrets["schema_bigdata"]
     engine   = create_engine(f'mysql+mysqlconnector://{user}:{password}@{host}/{schema}')    
     data     = pd.read_sql_query("""SELECT coddir,direccion,nombre_conjunto FROM bigdata.data_bogota_conjuntos """ , engine)
+    
+    idd = data['nombre_conjunto'].astype(str).str.contains('"')
+    if sum(idd)>0:
+        data.loc[idd,'nombre_conjunto'] = data.loc[idd,'nombre_conjunto'].apply(lambda x: x.strip('"'))
     data['via'] = data['direccion'].apply(lambda x: dir2comp(x,0))
     v           = data['via'].value_counts().reset_index()
     v           = v[v['count']>50]
@@ -496,12 +500,13 @@ def main():
         direccion = st.text_input('Dirección del edificio',value=st.session_state.ed_dir)
         
     with col4:
-        #st.write('')
-        #st.write('')
+        st.write('')
+        st.write('')
         if st.button('Buscar'):
             if direccion!='': 
                 st.session_state.coddir = coddir(direccion)
                 tracking(st.session_state.email,'building',st.session_state.coddir)
+                #st.experimental_rerun()
 
         
     if st.session_state.coddir!='':
