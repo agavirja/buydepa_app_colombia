@@ -80,7 +80,6 @@ def str2num(x):
     try: return int(float(x))
     except: return x
          
-@st.experimental_memo
 def convert_df(df):
    return df.to_csv(index=False).encode('utf-8')
 
