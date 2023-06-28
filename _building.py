@@ -282,10 +282,75 @@ def getdatanivel5(latitud,longitud):
         databarrio = pd.read_sql_query(f"""SELECT *,ST_AsText(geometry) as wkt FROM appraisal.barrios WHERE st_contains(geometry,point({longitud},{latitud}))""" , engine)
     
     if databarrio.empty is False:
-        codigo = databarrio['codigo'].iloc[0]
-        barriopricing         = pd.read_sql_query(f"""SELECT * FROM appraisal.colombia_venta_apartamento_barrio WHERE codigo={codigo};""" , engine)
-        barriocaracterizacion = pd.read_sql_query(f"""SELECT * FROM appraisal.colombia_venta_apartamento_caracterizacion WHERE codigo={codigo};""" , engine)
-        barriovalorizacion    = pd.read_sql_query(f"""SELECT * FROM appraisal.colombia_venta_apartamento_valorizacion WHERE codigo={codigo};""" , engine)
+        codigo             = databarrio['codigo'].iloc[0]
+    
+        tablaventa         = 'colombia_venta_apartamento_barrio'
+        tablaarriendo      = 'colombia_arriendo_apartamento_barrio'
+        databarrioventa    = pd.read_sql_query(f"""SELECT * FROM appraisal.{tablaventa} WHERE codigo='{codigo}'"""  , engine)
+        databarrioarriendo = pd.read_sql_query(f"""SELECT * FROM appraisal.{tablaarriendo} WHERE codigo='{codigo}'""" , engine)
+        
+        barriopricing = pd.DataFrame()
+        if databarrioventa.empty is False:
+            databarrioventa['tiponegocio'] = 'Venta'
+            barriopricing = pd.concat([barriopricing,databarrioventa])
+        if databarrioarriendo.empty is False:
+            databarrioarriendo['tiponegocio'] = 'Arriendo'
+            barriopricing = pd.concat([barriopricing,databarrioarriendo])
+        
+        if barriopricing.empty is False:
+            barriopricing['combinacion'] = None
+            idd = barriopricing['tipo']=='barrio'
+            if sum(idd)>0:
+                barriopricing.loc[idd,'combinacion'] = ''
+                
+            idd = barriopricing['tipo']=='complemento'
+            if sum(idd)>0:
+                barriopricing.loc[idd,'combinacion'] = barriopricing.loc[idd,'habitaciones'].astype(int).astype(str)+' H + '+barriopricing.loc[idd,'banos'].astype(int).astype(str)+' B'
+    
+            idd = barriopricing['tipo']=='complemento_garaje'
+            if sum(idd)>0:
+                barriopricing.loc[idd,'combinacion'] = barriopricing.loc[idd,'habitaciones'].astype(int).astype(str)+' H + '+barriopricing.loc[idd,'banos'].astype(int).astype(str)+' B + '+barriopricing.loc[idd,'garajes'].astype(int).astype(str)+' G'
+            
+        tablaventa               = 'colombia_venta_apartamento_valorizacion'
+        tablaarriendo            = 'colombia_arriendo_apartamento_valorizacion'
+        datavalorizacionventa    = pd.read_sql_query(f"""SELECT * FROM appraisal.{tablaventa} WHERE codigo='{codigo}'"""  , engine)
+        datavalorizacionarriendo = pd.read_sql_query(f"""SELECT * FROM appraisal.{tablaarriendo} WHERE codigo='{codigo}'""" , engine)
+    
+        barriovalorizacion = pd.DataFrame()
+        if datavalorizacionventa.empty is False:
+            datavalorizacionventa['tiponegocio'] = 'Venta'
+            barriovalorizacion = pd.concat([barriovalorizacion,datavalorizacionventa])
+        if datavalorizacionarriendo.empty is False:
+            datavalorizacionarriendo['tiponegocio'] = 'Arriendo'
+            barriovalorizacion = pd.concat([barriovalorizacion,datavalorizacionarriendo])
+            
+        if barriovalorizacion.empty is False:
+            barriovalorizacion['combinacion'] = None
+            idd = barriovalorizacion['tipo']=='barrio'
+            if sum(idd)>0:
+                barriovalorizacion.loc[idd,'combinacion'] = ''
+                
+            idd = barriovalorizacion['tipo']=='complemento'
+            if sum(idd)>0:
+                barriovalorizacion.loc[idd,'combinacion'] = barriovalorizacion.loc[idd,'habitaciones'].astype(int).astype(str)+' H + '+barriovalorizacion.loc[idd,'banos'].astype(int).astype(str)+' B'
+    
+            idd = barriovalorizacion['tipo']=='complemento_garaje'
+            if sum(idd)>0:
+                barriovalorizacion.loc[idd,'combinacion'] = barriovalorizacion.loc[idd,'habitaciones'].astype(int).astype(str)+' H + '+barriovalorizacion.loc[idd,'banos'].astype(int).astype(str)+' B + '+barriovalorizacion.loc[idd,'garajes'].astype(int).astype(str)+' G'
+        
+        tablaventa                  = 'colombia_venta_apartamento_caracterizacion'
+        tablaarriendo               = 'colombia_arriendo_apartamento_caracterizacion'
+        datacaracterizacionventa    = pd.read_sql_query(f"""SELECT variable,valor,tipo FROM appraisal.{tablaventa} WHERE codigo='{codigo}'"""  , engine)
+        datacaracterizacionarriendo = pd.read_sql_query(f"""SELECT variable,valor,tipo FROM appraisal.{tablaarriendo} WHERE codigo='{codigo}'""" , engine)
+        
+        barriocaracterizacion = pd.DataFrame()
+        if datacaracterizacionventa.empty is False:
+            datacaracterizacionventa['tiponegocio'] = 'Venta'
+            barriocaracterizacion = pd.concat([barriocaracterizacion,datacaracterizacionventa])
+        if datacaracterizacionarriendo.empty is False:
+            datacaracterizacionarriendo['tiponegocio'] = 'Arriendo'
+            barriocaracterizacion = pd.concat([barriocaracterizacion,datacaracterizacionarriendo])
+            
     engine.dispose()
     return databarrio,barriopricing,barriocaracterizacion,barriovalorizacion
 
@@ -432,6 +497,8 @@ def main():
         direccion = st.text_input('Dirección del edificio',value=st.session_state.ed_dir)
         
     with col4:
+        st.write('')
+        st.write('')
         if st.button('Buscar'):
             if direccion!='': 
                 st.session_state.coddir = coddir(direccion)
@@ -1040,77 +1107,49 @@ def main():
         # REFERENCIA DE PRECIOS BARRIO
         #-------------------------------------------------------------------------#
         st.markdown('<div style="background-color: #f2f2f2; border: 1px solid #fff; padding: 0px; margin-bottom: 20px;"><h1 style="margin: 0; font-size: 18px; text-align: center; color: #3A5AFF;">Referencia de precios en el barrio</h1></div>', unsafe_allow_html=True)
-        col1, col2, col3 = st.columns(3)
-        
+        col1, col2 = st.columns(2)
         with col1:
-            opciones = [int(x) for x in sorted(barriopricing['habitaciones'].unique()) if not np.isnan(x)]
-            habitaciones_barrio = st.selectbox('# Habitaciones',key='habitacionesbarrio',options=opciones)
-            
-            opciones = [int(x) for x in sorted(barriopricing['banos'].unique()) if not np.isnan(x)]
-            banos_barrio = st.selectbox('# Baños',key='banosbarrio',options=opciones)
-            
-            opciones = [int(x) for x in sorted(barriopricing['garajes'].unique()) if not np.isnan(x)]
+            sel_tiponegocio = st.selectbox('Tipo de negocio',options=['Venta','Arriendo'])
+        with col2:
+            opciones = list(barriopricing[barriopricing['tiponegocio']==sel_tiponegocio]['combinacion'].unique())+list(datavalorizacion[datavalorizacion['tiponegocio']==sel_tiponegocio]['combinacion'].unique())
+            opciones = list(set(opciones))
+            opciones = sorted(opciones)
+            opciones.remove('')
             opciones = ['']+opciones
-            garajes_barrio = st.selectbox('# Garajes',key='garajesbarrio',options=opciones)
-                    
+            sel_tipologia = st.selectbox('Tipología',options=opciones)
         
+        col    = st.columns(2)
+        conteo = 0
         if barriopricing.empty is False:
-            with col2:
-                valormt2barrio = barriopricing[barriopricing['tipo']=='barrio']['valormt2'].iloc[0]
-                obsbarrio      = barriopricing[barriopricing['tipo']=='barrio']['obs'].iloc[0]
-                
-                label = 'Precio por mt <sup>2</sup>'
-                if 'barrio' in dataconjunto:
-                    barrioname = dataconjunto['barrio'].iloc[0]
-                    label      = f'<label>Precio por mt <sup>2</sup><br>{barrioname}</label>'
+            idd = (barriopricing['tiponegocio']==sel_tiponegocio) 
+            if sel_tipologia=='':
+                idd = (idd) & (barriopricing['tipo']=='barrio')
+            else:
+                idd = (idd) & (barriopricing['combinacion']==sel_tipologia)
+            if sum(idd)>0:
+                with col[conteo]:
+                    valor = barriopricing[idd]['valormt2'].iloc[0]
+                    obs   = barriopricing[idd]['obs'].iloc[0]
+                    label = f'<label>Precio por mt <sup>2</sup><br>{sel_tiponegocio}</label>'
+                    html        = boxnumbermoney(f'${valor:,.1f}' ,f'Muestra: {obs}',label)
+                    html_struct = BeautifulSoup(html, 'html.parser')
+                    st.markdown(html_struct, unsafe_allow_html=True) 
+                    conteo += 1
                     
-                html        = boxnumbermoney(f'${valormt2barrio:,.0f}' ,f'Muestra: {obsbarrio}',label)
-                html_struct = BeautifulSoup(html, 'html.parser')
-                st.markdown(html_struct, unsafe_allow_html=True)
-    
-            with col2:
-                
-                tipologia = f'{habitaciones_barrio} H + {banos_barrio} B'
-                idd = (barriopricing['habitaciones']==habitaciones_barrio) &  (barriopricing['banos']==banos_barrio)
-                if garajes_barrio!='':
-                    idd = (idd) & (barriopricing['garajes']==garajes_barrio)  
-                    tipologia += f' + {garajes_barrio} G' 
-                valormt2barrio = barriopricing[idd]['valormt2'].iloc[0]
-                obsbarrio      = barriopricing[idd]['obs'].iloc[0]
-                
-                label       = f'<label>Precio por mt <sup>2</sup><br>{tipologia}<br>{barrioname}</label>'
-                html        = boxnumbermoney(f'${valormt2barrio:,.0f}',f'Muestra: {obsbarrio}',label)
-                html_struct = BeautifulSoup(html, 'html.parser')
-                st.markdown(html_struct, unsafe_allow_html=True)
-                
-    
         if barriovalorizacion.empty is False:
-            with col3:
-                valorizacionbarrio = barriovalorizacion[barriovalorizacion['tipo']=='barrio']['valorizacion'].iloc[0]
-    
-                label = 'Valorización anual'
-                if 'barrio' in dataconjunto:
-                    barrioname = dataconjunto['barrio'].iloc[0]
-                    label      = f'<label>Valorización anual<br>{barrioname}</label>'
-                    
-                html        = boxnumbermoney("{:.1%}".format(valorizacionbarrio),'&nbsp;',label)
-                html_struct = BeautifulSoup(html, 'html.parser')
-                st.markdown(html_struct, unsafe_allow_html=True)
-            
-            with col3:
-                tipologia = f'{habitaciones_barrio} H + {banos_barrio} B'
-                idd = (barriovalorizacion['habitaciones']==habitaciones_barrio) &  (barriovalorizacion['banos']==banos_barrio)
-                if garajes_barrio!='':
-                    idd = (idd) & (barriovalorizacion['garajes']==garajes_barrio)  
-                    tipologia += f' + {garajes_barrio} G' 
-                valorizacionbarrio = barriovalorizacion[idd]['valorizacion'].iloc[0]
-                
-                label       = f'<label>Valorización anual<br>{tipologia}<br>{barrioname}</label>'   
-                html        = boxnumbermoney("{:.1%}".format(valorizacionbarrio) ,'&nbsp;',label)
-                html_struct = BeautifulSoup(html, 'html.parser')
-                st.markdown(html_struct, unsafe_allow_html=True)
-                
-            
+            idd = (barriovalorizacion['tiponegocio']==sel_tiponegocio) 
+            if sel_tipologia=='':
+                idd = (idd) & (barriovalorizacion['tipo']=='barrio')
+            else:
+                idd = (idd) & (barriovalorizacion['combinacion']==sel_tipologia)
+            if sum(idd)>0:
+                with col[conteo]:
+                    valor       = barriovalorizacion[idd]['valorizacion'].iloc[0]
+                    label       = f'<label>Valorización anual<br>{sel_tiponegocio}</label>' 
+                    html        = boxnumbermoney("{:.1%}".format(valor),'&nbsp;',label)
+                    html_struct = BeautifulSoup(html, 'html.parser')
+                    st.markdown(html_struct, unsafe_allow_html=True) 
+                    conteo += 1                        
         #-------------------------------------------------------------------------#
         # ESTADISTICAS
         #-------------------------------------------------------------------------#
