@@ -838,6 +838,7 @@ def main():
                 grupoofertasventa = grupoofertasventa.sort_values(by=['rango','habitaciones','banos','garajes'],ascending=True)
                 grupoofertasventa['valormt2'] = grupoofertasventa['valormt2'].apply(lambda x: f'${x:,.0f}')
                 grupoofertasventa.rename(columns={'rango':'Rango de area','habitaciones':'# Habitaciones','banos':'# Baños','garajes':'# Garajes','valormt2':'Valor por mt2'},inplace=True)
+                grupoofertasventa = grupoofertasventa.fillna(value="")
                 st.dataframe(grupoofertasventa)
     
             
@@ -977,6 +978,7 @@ def main():
                 grupoofertasarriendo = grupoofertasarriendo.sort_values(by=['rango','habitaciones','banos','garajes'],ascending=True)
                 grupoofertasarriendo['valormt2'] = grupoofertasarriendo['valormt2'].apply(lambda x: f'${x:,.0f}')
                 grupoofertasarriendo.rename(columns={'rango':'Rango de area','habitaciones':'# Habitaciones','banos':'# Baños','garajes':'# Garajes','valormt2':'Valor por mt2'},inplace=True)
+                grupoofertasarriendo = grupoofertasarriendo.fillna(value="")
                 st.dataframe(grupoofertasarriendo)
     
             
@@ -1096,6 +1098,7 @@ def main():
         col1, col2 = st.columns(2)
         with col1:
             dataphones = pd.concat([datagaleria,datarecorrido])
+            dataphones = dataphones.fillna(value="")
             if dataphones.empty is False:
                 dataphones.rename(columns={'fecha_inicial':'Fecha','tipo_cliente':'Tipo de aviso','tipoinmueble':'Tip ode inmueble','tiponegocio':'Tipo de negocio'},inplace=True)
                 st.markdown('<div style="background-color: #f2f2f2; border: 1px solid #fff; padding: 0px; margin-bottom: 20px;"><h1 style="margin: 0; font-size: 18px; text-align: center; color: #3A5AFF;">Teléfonos de disponibles</h1></div>', unsafe_allow_html=True)
@@ -1107,8 +1110,6 @@ def main():
         #-------------------------------------------------------------------------#
         st.markdown('<div style="background-color: #f2f2f2; border: 1px solid #fff; padding: 0px; margin-bottom: 20px;"><h1 style="margin: 0; font-size: 18px; text-align: center; color: #3A5AFF;">Referencia de precios en el barrio</h1></div>', unsafe_allow_html=True)
         col1, col2 = st.columns(2)
-        st.dataframe(barriopricing)
-        st.dataframe(barriovalorizacion)
         with col1:
             sel_tiponegocio = st.selectbox('Tipo de negocio',options=['Venta','Arriendo'])
         with col2:
@@ -1132,7 +1133,7 @@ def main():
                     valor = barriopricing[idd]['valormt2'].iloc[0]
                     obs   = barriopricing[idd]['obs'].iloc[0]
                     label = f'<label>Precio por mt <sup>2</sup><br>{sel_tiponegocio}</label>'
-                    html        = boxnumbermoney(f'${valor:,.1f}' ,f'Muestra: {obs}',label)
+                    html        = boxnumbermoney(f'${valor:,.0f}' ,f'Muestra: {obs}',label)
                     html_struct = BeautifulSoup(html, 'html.parser')
                     st.markdown(html_struct, unsafe_allow_html=True) 
                     conteo += 1
@@ -1154,9 +1155,10 @@ def main():
         #-------------------------------------------------------------------------#
         # ESTADISTICAS
         #-------------------------------------------------------------------------#
-        col = st.columns(2)
-        if barriocaracterizacion.empty is False:
-            barriocaracterizacion['variable'] = barriocaracterizacion['variable'].apply(lambda x: str2num(x))
+        col    = st.columns(2)
+        dfpaso = barriocaracterizacion[barriocaracterizacion['tiponegocio']==sel_tiponegocio]
+        if dfpaso.empty is False:
+            dfpaso['variable'] = dfpaso['variable'].apply(lambda x: str2num(x))
             formato = [{'name':'areaconstruida','label':'Área construida','order':['50 o menos mt2', '50 a 80 mt2', '80 a 100 mt2', '100 a 150 mt2','150 a 200 mt2', '200 a 300 mt2','300 o más mt2']},
                        {'name':'habitaciones','label':'Habitaciones'},
                        {'name':'banos','label':'Baños'},
@@ -1164,7 +1166,7 @@ def main():
               
             conteo = 0
             for i in formato:
-                df = barriocaracterizacion[barriocaracterizacion['tipo']==i['name']]
+                df = dfpaso[dfpaso['tipo']==i['name']]
                 if df.empty is False:                
                     df = df.sort_values(by='variable',ascending=True)
                     if 'order' in i:
