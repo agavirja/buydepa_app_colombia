@@ -283,7 +283,6 @@ def getdatanivel5(latitud,longitud):
     
     if databarrio.empty is False:
         codigo             = databarrio['codigo'].iloc[0]
-    
         tablaventa         = 'colombia_venta_apartamento_barrio'
         tablaarriendo      = 'colombia_arriendo_apartamento_barrio'
         databarrioventa    = pd.read_sql_query(f"""SELECT * FROM appraisal.{tablaventa} WHERE codigo='{codigo}'"""  , engine)
@@ -1111,7 +1110,7 @@ def main():
         with col1:
             sel_tiponegocio = st.selectbox('Tipo de negocio',options=['Venta','Arriendo'])
         with col2:
-            opciones = list(barriopricing[barriopricing['tiponegocio']==sel_tiponegocio]['combinacion'].unique())+list(datavalorizacion[datavalorizacion['tiponegocio']==sel_tiponegocio]['combinacion'].unique())
+            opciones = list(barriopricing[barriopricing['tiponegocio']==sel_tiponegocio]['combinacion'].unique())+list(barriovalorizacion[barriovalorizacion['tiponegocio']==sel_tiponegocio]['combinacion'].unique())
             opciones = list(set(opciones))
             opciones = sorted(opciones)
             opciones.remove('')
