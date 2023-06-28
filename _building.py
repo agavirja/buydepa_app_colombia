@@ -776,14 +776,13 @@ def main():
                     if variables!=[]:
                         datapropietario.drop(columns=variables,inplace=True)
     
-                    st.dataframe(datapropietario)
                     csv = convert_df(datapropietario)
                     st.download_button(
                        "Información propietario",
                        csv,
                        "info_predio.csv",
                        "text/csv",
-                       key='info_predio'
+                       key='info_predio_download'
                     )
                     
                     
@@ -808,14 +807,13 @@ def main():
                     
                     st.plotly_chart(fig)   
                     
-                    st.dataframe(v)
                     csv = convert_df(v)
                     st.download_button(
                        "Avalúo catastral",
                        csv,
                        "info_avaluo.csv",
                        "text/csv",
-                       key='info_avaluo'
+                       key='info_avaluo_download'
                     )
     
                 
