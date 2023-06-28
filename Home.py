@@ -111,6 +111,7 @@ if st.session_state.login:
                 st.session_state.access = True
                 st.session_state.login  = False
                 st.session_state.signin = False
+                st.session_state.layout = "wide"
                 tracking(email,'login')
                 st.experimental_rerun()
             else:
@@ -141,26 +142,26 @@ if st.session_state.signin:
                     time.sleep(2)
                     st.session_state.login  = True
                     st.session_state.signin = False
+                    st.session_state.layout = "wide"
                     st.experimental_rerun()
             else:
                 st.error(response)
                 
 if st.session_state.access:
-    st.session_state.layout = "wide"
     opciones = {
         'Opcion 1': {
             'url': f'https://buydepa-app-colombia.streamlit.app/Listings?token={st.session_state.token}',
-            'imagen': 'https://personal-data-bucket-online.s3.us-east-2.amazonaws.com/buydepa/mapa.png',
+            'imagen': 'https://personal-data-bucket-online.s3.us-east-2.amazonaws.com/buydepa/listings_map.png',
             'titulo': 'Listings'
         },
         'Opcion 2': {
             'url': f'https://buydepa-app-colombia.streamlit.app/Detalle_edificio?token={st.session_state.token}',
-            'imagen': 'https://personal-data-bucket-online.s3.us-east-2.amazonaws.com/buydepa/edificio.png',
+            'imagen': 'https://personal-data-bucket-online.s3.us-east-2.amazonaws.com/buydepa/building_pic.png',
             'titulo': 'Análisis por Edificio'
         },
         'Opcion 3': {
             'url': 'https://buydepa-app-colombia.streamlit.app/Ficha',
-            'imagen': 'https://personal-data-bucket-online.s3.us-east-2.amazonaws.com/buydepa/tarjetarealestate.png',
+            'imagen': 'https://personal-data-bucket-online.s3.us-east-2.amazonaws.com/buydepa/ficha_pic.png',
             'titulo': 'Ficha del inmueble'
         }
     }
