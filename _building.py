@@ -501,7 +501,7 @@ def main():
         #-------------------------------------------------------------------------#  
         if dataprocesos.empty is False:
             st.markdown('<div style="background-color: #f2f2f2; border: 1px solid #fff; padding: 0px; margin-bottom: 20px;"><h1 style="margin: 0; font-size: 18px; text-align: center; color: #3A5AFF;"><b>Histórico de inmuebles vendidos</b></h1></div>', unsafe_allow_html=True)
-            col1, col2, col3, col4 = st.columns([1,1,2,2])
+            col1, col2 = st.columns(2)
             with col1: 
                 label       = '<label>Total transacciones<br>(últimos 4 años)</label>'
                 html        = boxkpi(len(dataprocesos),label)
@@ -528,7 +528,8 @@ def main():
                 html_struct = BeautifulSoup(html, 'html.parser')
                 st.markdown(html_struct, unsafe_allow_html=True)    
                 
-            with col3:
+            col1, col2 = st.columns(2)
+            with col1:
                 datatable            = dataprocesos[['direccion', 'areaconstruida', 'fecha_documento_publico', 'cuantia']].copy()
                 datatable['cuantia'] = datatable['cuantia'].apply(lambda x: f'${x:,.0f}')
                 datatable.rename(columns={'direccion': 'Predio','areaconstruida':'Area construida', 'nombre': 'Tipo de proceso', 'tarifa': 'Tarifa', 'cuantia': 'Valor', 'tipo_documento_publico': 'Tipo', 'numero_documento_publico': '# documento', 'fecha_documento_publico': 'Fecha', 'oficina': 'Oficina registro', 'entidad': 'Notaria'},inplace=True)
@@ -551,7 +552,7 @@ def main():
                     columns_auto_size_mode=ColumnsAutoSizeMode.FIT_ALL_COLUMNS_TO_VIEW,
                     use_checkbox=True)
             
-            with col4:
+            with col2:
                 if response_close['selected_rows']:
                     datapaso          = dataprocesos[dataprocesos['direccion']==response_close['selected_rows'][0]['Predio']]
                     dataprocesosdocid = getdatadocid(datapaso['docid'].iloc[0])
