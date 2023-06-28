@@ -496,8 +496,8 @@ def main():
         direccion = st.text_input('Dirección del edificio',value=st.session_state.ed_dir)
         
     with col4:
-        st.write('')
-        st.write('')
+        #st.write('')
+        #st.write('')
         if st.button('Buscar'):
             if direccion!='': 
                 st.session_state.coddir = coddir(direccion)
@@ -838,7 +838,9 @@ def main():
                 grupoofertasventa = grupoofertasventa.sort_values(by=['rango','habitaciones','banos','garajes'],ascending=True)
                 grupoofertasventa['valormt2'] = grupoofertasventa['valormt2'].apply(lambda x: f'${x:,.0f}')
                 grupoofertasventa.rename(columns={'rango':'Rango de area','habitaciones':'# Habitaciones','banos':'# Baños','garajes':'# Garajes','valormt2':'Valor por mt2'},inplace=True)
-                grupoofertasventa = grupoofertasventa.fillna(value="")
+                idd = grupoofertasventa['garajes'].isnull()
+                if sum(idd)>0:
+                    grupoofertasventa.loc[idd,'garajes'] = ''
                 st.dataframe(grupoofertasventa)
     
             
@@ -978,7 +980,9 @@ def main():
                 grupoofertasarriendo = grupoofertasarriendo.sort_values(by=['rango','habitaciones','banos','garajes'],ascending=True)
                 grupoofertasarriendo['valormt2'] = grupoofertasarriendo['valormt2'].apply(lambda x: f'${x:,.0f}')
                 grupoofertasarriendo.rename(columns={'rango':'Rango de area','habitaciones':'# Habitaciones','banos':'# Baños','garajes':'# Garajes','valormt2':'Valor por mt2'},inplace=True)
-                grupoofertasarriendo = grupoofertasarriendo.fillna(value="")
+                idd = grupoofertasarriendo['garajes'].isnull()
+                if sum(idd)>0:
+                    grupoofertasarriendo.loc[idd,'garajes'] = ''
                 st.dataframe(grupoofertasarriendo)
     
             
@@ -1098,7 +1102,10 @@ def main():
         col1, col2 = st.columns(2)
         with col1:
             dataphones = pd.concat([datagaleria,datarecorrido])
-            dataphones = dataphones.fillna(value="")
+            for i in list(dataphones):
+                idd = dataphones[i].isnull()
+                if sum(idd)>0:
+                    dataphones.loc[idd,i] = ''
             if dataphones.empty is False:
                 dataphones.rename(columns={'fecha_inicial':'Fecha','tipo_cliente':'Tipo de aviso','tipoinmueble':'Tip ode inmueble','tiponegocio':'Tipo de negocio'},inplace=True)
                 st.markdown('<div style="background-color: #f2f2f2; border: 1px solid #fff; padding: 0px; margin-bottom: 20px;"><h1 style="margin: 0; font-size: 18px; text-align: center; color: #3A5AFF;">Teléfonos de disponibles</h1></div>', unsafe_allow_html=True)
