@@ -837,10 +837,10 @@ def main():
                 grupoofertasventa.index = range(len(grupoofertasventa))
                 grupoofertasventa = grupoofertasventa.sort_values(by=['rango','habitaciones','banos','garajes'],ascending=True)
                 grupoofertasventa['valormt2'] = grupoofertasventa['valormt2'].apply(lambda x: f'${x:,.0f}')
-                grupoofertasventa.rename(columns={'rango':'Rango de area','habitaciones':'# Habitaciones','banos':'# Baños','garajes':'# Garajes','valormt2':'Valor por mt2'},inplace=True)
                 idd = grupoofertasventa['garajes'].isnull()
                 if sum(idd)>0:
                     grupoofertasventa.loc[idd,'garajes'] = ''
+                grupoofertasventa.rename(columns={'rango':'Rango de area','habitaciones':'# Habitaciones','banos':'# Baños','garajes':'# Garajes','valormt2':'Valor por mt2'},inplace=True)
                 st.dataframe(grupoofertasventa)
     
             
@@ -979,10 +979,10 @@ def main():
                 grupoofertasarriendo.index = range(len(grupoofertasarriendo))
                 grupoofertasarriendo = grupoofertasarriendo.sort_values(by=['rango','habitaciones','banos','garajes'],ascending=True)
                 grupoofertasarriendo['valormt2'] = grupoofertasarriendo['valormt2'].apply(lambda x: f'${x:,.0f}')
-                grupoofertasarriendo.rename(columns={'rango':'Rango de area','habitaciones':'# Habitaciones','banos':'# Baños','garajes':'# Garajes','valormt2':'Valor por mt2'},inplace=True)
                 idd = grupoofertasarriendo['garajes'].isnull()
                 if sum(idd)>0:
                     grupoofertasarriendo.loc[idd,'garajes'] = ''
+                grupoofertasarriendo.rename(columns={'rango':'Rango de area','habitaciones':'# Habitaciones','banos':'# Baños','garajes':'# Garajes','valormt2':'Valor por mt2'},inplace=True)
                 st.dataframe(grupoofertasarriendo)
     
             
